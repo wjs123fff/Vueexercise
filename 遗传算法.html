@@ -1,0 +1,188 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <script language="javascript" type="text/javascript" src="https://cdn.jsdelivr.net/npm/p5@1.0.0/lib/p5.min.js"></script>
+</head>
+<body>
+<div id="outText">
+</div>
+<script>
+
+var cities = [];
+//存储城市坐标
+var totalCities = 15;
+//设置城市数量
+var popSize = 600;
+//原始的种群数量
+var population = [];
+//人口数量
+var fitness = [];
+//将后代最优存入数组中
+var recordDistance = Infinity;//初始距离无穷大
+var bestEver;
+//基因就是城市路径，存储最短路径，也就是最佳基因
+var currentBest;
+//存储最佳路径
+var statusP;
+
+function setup() {
+  createCanvas(800, 800);
+  var order = [];
+  //随机生成城市点
+  for (var i = 0; i < totalCities; i++) {
+    var v = createVector(random(width), random(height/1.5));
+    cities[i] = v;
+    order[i] = i;
+  }
+//基因个体数，生成的随机路径就是个体数
+  for (var i = 0; i < popSize; i++) {
+    population[i] = shuffle(order);
+  }
+  statusP = createP('').style('font-size', '32pt');
+}
+
+function draw() {
+  background(0);
+
+  // GA
+  calculateFitness();
+  normalizeFitness();
+  nextGeneration();
+
+
+  stroke(255,0,255);
+  strokeWeight(4);
+  noFill();
+  beginShape();
+  for (var i = 0; i < bestEver.length; i++) {
+    var n = bestEver[i];
+    vertex(cities[n].x, cities[n].y);
+    ellipse(cities[n].x, cities[n].y, 8, 8);
+  }
+  endShape();
+
+  stroke(255,0,255);
+  strokeWeight(1);
+  noFill();
+  beginShape();
+  for (var i = 0; i < currentBest.length; i++) {
+    var n = currentBest[i];
+    vertex(cities[n].x, cities[n].y);
+    ellipse(cities[n].x, cities[n].y, 8, 8);
+  }
+  endShape();
+}
+
+function shuffle(order) {                                                  //打乱数组生成父代
+    var length = order.length,
+      randomIndex,
+      temp;
+    while (length) {
+      randomIndex = Math.floor(Math.random() * (length--));
+      temp = order[randomIndex];
+      order[randomIndex] = order[length];
+      order[length] = temp
+    }
+    return order;
+  }
+
+
+function swap(a, i, j) {
+  var temp = a[i];
+  a[i] = a[j];
+  a[j] = temp;
+}
+//计算城市的距离
+function calcDistance(points, order) {
+  var sum = 0;
+  for (var i = 0; i < order.length - 1; i++) {
+    var cityAIndex = order[i];
+    var cityA = points[cityAIndex];
+    var cityBIndex = order[i + 1];
+    var cityB = points[cityBIndex];
+    var d = dist(cityA.x, cityA.y, cityB.x, cityB.y);
+    sum += d;
+  }
+  return sum;
+}
+
+function calculateFitness() {
+  var currentRecord = Infinity;
+  for (var i = 0; i < population.length; i++) {
+    var d = calcDistance(cities, population[i]);
+    if (d < recordDistance) {
+      recordDistance = d;
+      bestEver = population[i];
+    }
+    if (d < currentRecord) {
+      currentRecord = d;
+      currentBest = population[i];
+    }
+
+//
+    fitness[i] = 1 / (pow(d, 8) + 1);
+  }
+}
+
+function normalizeFitness() {
+  var sum = 0;
+  for (var i = 0; i < fitness.length; i++) {
+    sum += fitness[i];
+  }
+  for (var i = 0; i < fitness.length; i++) {
+    fitness[i] = fitness[i] / sum;
+  }
+}
+
+function nextGeneration() {
+  var newPopulation = [];
+  for (var i = 0; i < population.length; i++) {
+    var orderA = pickOne(population, fitness);
+    var orderB = pickOne(population, fitness);
+    var order = crossOver(orderA, orderB);
+    mutate(order, 0.01);//变异率
+    newPopulation[i] = order;
+  }
+  population = newPopulation;
+}
+// 遗传算法中的交叉变异概率在编子函数时，应该是rand(1)产生的随机数小于交叉率Pc,或交叉率Pm才能进行交叉变异操作。
+//   因为遗传算法中，交叉变异操作是以一定的交叉率Pc和一定的变异率Pm执行的。所以首先选择参与交叉或变异操作的个体进入到交配池，选择过程是随机选择的，即满足rand(1) <Pc或rand(1) <Pm才被选择
+
+function pickOne(list, prob) {
+  var index = 0;
+  var r = random(1);
+
+  while (r > 0) {
+    r = r - prob[index];
+    index++;
+  }
+  index--;
+  return list[index].slice();
+}
+
+function crossOver(orderA, orderB) {
+  var start = floor(random(orderA.length));
+  var end = floor(random(start + 1, orderA.length));
+  var neworder = orderA.slice(start, end);
+  for (var i = 0; i < orderB.length; i++) {
+    var city = orderB[i];
+    if (!neworder.includes(city)) {
+      neworder.push(city);
+    }
+  }
+  return neworder;
+}
+
+function mutate(order, mutationRate) {
+  for (var i = 0; i < totalCities; i++) {
+    if (random(1) < mutationRate) {
+      var indexA = floor(random(order.length));
+      var indexB = (indexA + 1) % totalCities;
+      swap(order, indexA, indexB);
+    }
+  }
+}
+
+</script>
+</body>
+</html>
