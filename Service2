@@ -1,0 +1,9 @@
+//薪资类型管理
+
+	List<Salary> get_SalaryList(Integer page,Integer size);
+	List<Salary> get_SalaryLikeList(String content);
+	Salary get_SalaryInfo(Integer id);
+	void update_SalaryInfo(Salary data);
+	void insert_SalaryInfo(Salary data);
+	void delete_SalaryInfo(Integer id);
+	List<Salary> findAllSalary(Integer page, Integer size);
