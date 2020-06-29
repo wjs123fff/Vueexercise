@@ -1,0 +1,40 @@
+/*
+ Navicat Premium Data Transfer
+
+ Source Server         : localhost_3307
+ Source Server Type    : MySQL
+ Source Server Version : 50562
+ Source Host           : localhost:3307
+ Source Schema         : personnel
+
+ Target Server Type    : MySQL
+ Target Server Version : 50562
+ File Encoding         : 65001
+
+ Date: 29/06/2020 13:59:53
+*/
+
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for salary_inf
+-- ----------------------------
+DROP TABLE IF EXISTS `salary_inf`;
+CREATE TABLE `salary_inf`  (
+  `s_id` int(11) NOT NULL AUTO_INCREMENT,
+  `dept_id` int(11) NULL DEFAULT NULL,
+  `job_id` int(11) NULL DEFAULT NULL,
+  `name` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `card_id` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `address` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `email` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `education` varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  PRIMARY KEY (`s_id`) USING BTREE,
+  INDEX `dept_id`(`dept_id`) USING BTREE,
+  INDEX `job_id`(`job_id`) USING BTREE,
+  CONSTRAINT `salary_inf_ibfk_1` FOREIGN KEY (`dept_id`) REFERENCES `dept_inf` (`dept_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `salary_inf_ibfk_2` FOREIGN KEY (`job_id`) REFERENCES `job_inf` (`job_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+
+SET FOREIGN_KEY_CHECKS = 1;
