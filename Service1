@@ -1,0 +1,87 @@
+//薪资管理
+@Override
+public List<Salary> get_SalaryList(Integer page,Integer size) {
+	// TODO Auto-generated method stub
+	/**
+	 * 将部门，职位id中的信息提取出来
+	 */
+
+		PageHelper.startPage(page,size);
+	List<Salary> list = salarydao.get_List();
+	int size1 = list.size();
+	List<Salary> list2 = new ArrayList<>();
+	for (int i = 0; i < size1; i++) {
+		Salary data = list.get(i);
+		Dept dept = deptDao.get_Info(data.getDept_id());
+		data.setDept(dept);
+		Job job = jobDao.get_Info(data.getJob_id());
+		data.setJob(job);
+		list2.add(i, data);
+	}
+	return list2;
+}
+
+	@Override
+	public List<Salary> get_SalaryLikeList(String content) {
+		// TODO Auto-generated method stub
+		/**
+		 * 将部门，职位id中的信息提取出来
+		 */
+		List<Salary> list = salarydao.get_LikeList(content);
+		int size = list.size();
+		List<Salary> list2 = new ArrayList<>();
+		for (int i = 0; i < size; i++) {
+			Salary data = list.get(i);
+			Dept dept = deptDao.get_Info(data.getDept_id());
+			data.setDept(dept);
+			Job job = jobDao.get_Info(data.getJob_id());
+			data.setJob(job);
+			list2.add(i, data);
+		}
+		return list2;
+	}
+
+	@Override
+	public Salary get_SalaryInfo(Integer id) {
+		// TODO Auto-generated method stub
+		Salary data = salarydao.get_Info(id);
+		Dept dept = deptDao.get_Info(data.getDept_id());
+		data.setDept(dept);
+		Job job = jobDao.get_Info(data.getJob_id());
+		data.setJob(job);
+		return data;
+	}
+
+	@Override
+	public void update_SalaryInfo(Salary data) {
+		// TODO Auto-generated method stub
+		salarydao.update_Info(data);
+	}
+
+	@Override
+	public void insert_SalaryInfo(Salary data) {
+		// TODO Auto-generated method stub
+		/**
+		 * 将职位id和部门id提取，或者不管，因为直接存到数据库了，不管
+		 */
+		salarydao.insert_Info(data);
+	}
+
+
+	@Override
+	public void delete_SalaryInfo(Integer id) {
+		// TODO Auto-generated method stub
+		salarydao.delete_SalaryInfo(id);
+	}
+
+	@Override
+	public List<Salary> findAllSalary(Integer page, Integer size) {
+		PageHelper.startPage(page,size);
+		return salarydao.selectAllSalary();
+	}
+
+	public List<Salary> findAllSalary(String content) {
+		// TODO Auto-generated method stub
+		System.out.println(content);
+		return salarydao.selectLikeAllSalary(content);
+	}
